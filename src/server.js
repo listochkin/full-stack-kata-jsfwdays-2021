@@ -163,6 +163,12 @@ async function* listing(absolutePath, relativePath) {
 }
 
 async function performFileUpload(request, response) {
+  if (!isLoggedIn(request)) {
+    response.statusCode = 401;
+    response.end();
+    return;
+  }
+
   const formParser = new formidable.IncomingForm();
 
   const {
@@ -193,4 +199,14 @@ function redirectBack(request, response) {
   response.statusCode = 302;
   response.setHeader('Location', `${request.headers.referer}`);
   response.end();
+}
+
+function isLoggedIn(request) {
+  const sessionId = (request.headers.cookie || '')
+    .split(';')
+    .map(cookie => new URLSearchParams(cookie))
+    .filter(usp => usp.has('session'))
+    .map(usp => usp.get('session'))
+    .find(s => s.length === 36);
+  return SESSIONS.has(sessionId) && SESSIONS.get(sessionId) > new Date();
 }
