@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "static file server",
   "main": "src/cli.js",
+  "type": "module",
   "scripts": {
     "format": "prettier --single-quote --arrow-parens=avoid --write .",
     "watch": "nodemon .",
