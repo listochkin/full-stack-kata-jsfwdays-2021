@@ -4,6 +4,9 @@
   "description": "static file server",
   "main": "src/cli.js",
   "type": "module",
+  "bin": {
+    "kata": "src/cli.js"
+  },
   "scripts": {
     "format": "prettier --single-quote --arrow-parens=avoid --write .",
     "watch": "nodemon .",
