@@ -1,0 +1,25 @@
+{
+  "name": "full-stack-kata-jsfwdays-2021",
+  "version": "1.0.0",
+  "description": "static file server",
+  "main": "src/cli.js",
+  "scripts": {
+    "format": "prettier --single-quote --arrow-parens=avoid --write .",
+    "watch": "nodemon .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/listochkin/full-stack-kata-jsfwdays-2021.git"
+  },
+  "author": "Andrey Listochkin <andrey.listochkin@gmail.com>",
+  "license": "CC0-1.0",
+  "bugs": {
+    "url": "https://github.com/listochkin/full-stack-kata-jsfwdays-2021/issues"
+  },
+  "homepage": "https://github.com/listochkin/full-stack-kata-jsfwdays-2021#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.7",
+    "prettier": "^2.3.1"
+  }
+}
