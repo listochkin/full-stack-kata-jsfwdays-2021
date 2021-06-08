@@ -80,10 +80,17 @@ async function serveContent(request, response) {
     return;
   }
 
+  const isDownload = !!url.searchParams.get('download');
+
   let isDirectory;
   try {
     isDirectory = (await stat(absolutePath)).isDirectory();
   } catch (error) {}
+
+  if (isDownload && !isDirectory) {
+    await pipeline(createReadStream(absolutePath), response);
+    return;
+  }
 
   const html = await readFile(new URL('./index.html', import.meta.url), {
     encoding: 'utf8',
@@ -148,6 +155,7 @@ async function* listing(absolutePath, relativePath) {
     yield `
       <li>
         <a href="${relativePath}/${name}">${name}</a>
+        <a href="${relativePath}/${name}?download=1" download>⤵️</a>
       </li>
     `;
   yield '</ul>';
