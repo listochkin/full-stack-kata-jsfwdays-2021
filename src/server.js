@@ -1,5 +1,7 @@
 import * as http from 'http';
 import { networkInterfaces } from 'os';
+import { readFile } from 'fs/promises';
+import { exec } from 'child_process';
 
 export function startServer(port) {
   console.log('Starting server on port ' + port);
@@ -10,9 +12,14 @@ export function startServer(port) {
         .map(iRecord => console.log(`http://${iRecord.address}:${port}`));
     });
   });
+
+  setTimeout(() => {
+    exec(`curl 'http://localhost:2021/'`);
+  }, 200);
 }
 
-const server = http.createServer((request, response) => {
-  response.write('Hello from server');
+const server = http.createServer(async (request, response) => {
+  const html = await readFile(new URL('./index.html', import.meta.url));
+  response.write(html);
   response.end();
 });
