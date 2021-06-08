@@ -4,6 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Full Stack Kata</title>
+    <style>
+      .error input[type='password'] {
+        outline: 2px solid red;
+      }
+    </style>
   </head>
   <body>
     <details id="loginForm" open>
@@ -18,7 +23,32 @@
     </details>
     hello from html
     <script type="module" nonce="NONCE">
-      console.log('hello from console');
+      document
+        .getElementById('loginForm')
+        .addEventListener('submit', async event => {
+          event.preventDefault();
+          event.stopPropagation();
+
+          const form = event.target;
+          const inputs = [...form.querySelectorAll('input')];
+          const formData = new URLSearchParams(
+            inputs.map(input => [input.name, input.value])
+          );
+
+          const response = await fetch(form.action, {
+            method: form.method,
+            body: formData,
+          });
+
+          if (response.ok) {
+            form.classList.remove('error');
+            setTimeout(() => {
+              document.getElementById('loginForm').open = false;
+            }, 800);
+          } else {
+            form.classList.add('error');
+          }
+        });
     </script>
   </body>
 </html>
