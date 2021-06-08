@@ -21,7 +21,6 @@
         <p><input type="submit" name="login" value="Login" /></p>
       </form>
     </details>
-    hello from html
     <script type="module" nonce="NONCE">
       document
         .getElementById('loginForm')
@@ -50,6 +49,15 @@
           }
         });
     </script>
+
+    <form action="/upload" method="post" enctype="multipart/form-data">
+      <p>
+        <label for="uploadFile">Select a file to upload</label>
+        <input type="file" name="uploadFile" />
+      </p>
+      <p><input type="submit" name="upload" value="Upload" /></p>
+    </form>
+
     CONTENT
   </body>
 </html>

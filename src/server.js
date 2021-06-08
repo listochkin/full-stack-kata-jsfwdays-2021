@@ -1,11 +1,12 @@
 import * as http from 'http';
 import { networkInterfaces } from 'os';
-import { readFile, access, stat, opendir } from 'fs/promises';
+import { readFile, access, stat, opendir, rename } from 'fs/promises';
 import { exec } from 'child_process';
 import { randomUUID } from 'crypto';
 import { join as pathJoin } from 'path';
 import { pipeline } from 'stream/promises';
 import { createReadStream } from 'fs';
+import formidable from 'formidable';
 
 const SESSIONS = new Map();
 
@@ -33,6 +34,8 @@ const server = http.createServer(async (request, response) => {
     await performLogin(request, response);
   } else if (request.method === 'GET') {
     await serveContent(request, response);
+  } else if (request.method === 'POST' && request.url === '/upload') {
+    await performFileUpload(request, response);
   } else {
     response.statusCode = 400;
     response.end();
@@ -57,9 +60,7 @@ async function performLogin(request, response) {
       ].join(';')
     );
 
-    response.statusCode = 302;
-    response.setHeader('Location', `${request.headers.referer}`);
-    response.end();
+    redirectBack(request, response);
   } else {
     response.statusCode = 401;
     response.end();
@@ -159,4 +160,37 @@ async function* listing(absolutePath, relativePath) {
       </li>
     `;
   yield '</ul>';
+}
+
+async function performFileUpload(request, response) {
+  const formParser = new formidable.IncomingForm();
+
+  const {
+    files: { uploadFile },
+  } = await new Promise((resolve, reject) => {
+    formParser.parse(request, (error, fields, files) => {
+      if (error) reject(error);
+      else resolve({ fields, files });
+    });
+  });
+
+  let newPath = pathJoin(
+    root,
+    new URL(request.headers.referer).pathname,
+    uploadFile.name
+  );
+  try {
+    await access(newPath);
+    newPath += '.' + randomUUID();
+  } catch (error) {}
+
+  await rename(uploadFile.path, newPath);
+
+  redirectBack(request, response);
+}
+
+function redirectBack(request, response) {
+  response.statusCode = 302;
+  response.setHeader('Location', `${request.headers.referer}`);
+  response.end();
 }
