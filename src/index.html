@@ -6,6 +6,16 @@
     <title>Full Stack Kata</title>
   </head>
   <body>
+    <details id="loginForm" open>
+      <summary>Login to enable file upload</summary>
+      <form action="/login" method="post">
+        <p>
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" />
+        </p>
+        <p><input type="submit" name="login" value="Login" /></p>
+      </form>
+    </details>
     hello from html
     <script type="module">
       console.log('hello from console');
