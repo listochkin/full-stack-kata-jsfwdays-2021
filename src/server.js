@@ -2,6 +2,9 @@ import * as http from 'http';
 import { networkInterfaces } from 'os';
 import { readFile } from 'fs/promises';
 import { exec } from 'child_process';
+import { randomUUID } from 'crypto';
+
+const SESSIONS = new Map();
 
 let uploadPassword;
 
@@ -39,6 +42,17 @@ async function performLogin(request, response) {
   const userPassword = formData.get('password');
   if (userPassword === uploadPassword) {
     // TODO save session
+    const sessionId = randomUUID();
+    const sessionExpiryDate = new Date(Date.now() + 5 * 60 * 1000);
+    SESSIONS.set(sessionId, sessionExpiryDate);
+    response.setHeader(
+      'Set-Cookie',
+      [
+        `session=${sessionId}`,
+        `Expires=${sessionExpiryDate.toISOString()}`,
+        'HttpOnly',
+      ].join(';')
+    );
 
     response.statusCode = 302;
     response.setHeader('Location', `${request.headers.referer}`);
@@ -50,7 +64,14 @@ async function performLogin(request, response) {
 }
 
 async function serveContent(request, response) {
-  const html = await readFile(new URL('./index.html', import.meta.url));
-  response.write(html);
+  const html = await readFile(new URL('./index.html', import.meta.url), {
+    encoding: 'utf8',
+  });
+  const cspNonce = randomUUID();
+  response.setHeader(
+    'Content-Security-Policy',
+    `script-src 'nonce-${cspNonce}'`
+  );
+  response.write(html.replace('NONCE', cspNonce));
   response.end();
 }
